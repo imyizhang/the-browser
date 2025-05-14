@@ -1,13 +1,12 @@
+import logging
 import os
 
 import gradio as gr
-import logging
-from gradio.components import Component
 
 from src.webui.webui_manager import WebuiManager
-from src.utils import config
 
 logger = logging.getLogger(__name__)
+
 
 async def close_browser(webui_manager: WebuiManager):
     """
@@ -27,6 +26,7 @@ async def close_browser(webui_manager: WebuiManager):
         await webui_manager.bu_browser.close()
         webui_manager.bu_browser = None
 
+
 def create_browser_settings_tab(webui_manager: WebuiManager):
     """
     Creates a browser settings tab.
@@ -38,12 +38,14 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
         with gr.Row():
             browser_binary_path = gr.Textbox(
                 label="Browser Binary Path",
+                value=os.getenv("BROWSER_PATH", None),
                 lines=1,
                 interactive=True,
-                placeholder="e.g. '/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome'"
+                placeholder="e.g. '/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome'",
             )
             browser_user_data_dir = gr.Textbox(
                 label="Browser User Data Dir",
+                value=os.getenv("BROWSER_USER_DATA", None),
                 lines=1,
                 interactive=True,
                 placeholder="Leave it empty if you use your default user data",
@@ -52,27 +54,27 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
         with gr.Row():
             use_own_browser = gr.Checkbox(
                 label="Use Own Browser",
-                value=False,
+                value=os.getenv("USE_OWN_BROWSER", True),
                 info="Use your existing browser instance",
-                interactive=True
+                interactive=True,
             )
             keep_browser_open = gr.Checkbox(
                 label="Keep Browser Open",
                 value=os.getenv("KEEP_BROWSER_OPEN", True),
                 info="Keep Browser Open between Tasks",
-                interactive=True
+                interactive=True,
             )
             headless = gr.Checkbox(
                 label="Headless Mode",
                 value=False,
                 info="Run browser without GUI",
-                interactive=True
+                interactive=True,
             )
             disable_security = gr.Checkbox(
                 label="Disable Security",
                 value=False,
                 info="Disable browser security",
-                interactive=True
+                interactive=True,
             )
 
     with gr.Group():
@@ -81,13 +83,13 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
                 label="Window Width",
                 value=1280,
                 info="Browser window width",
-                interactive=True
+                interactive=True,
             )
             window_h = gr.Number(
                 label="Window Height",
                 value=1100,
                 info="Browser window height",
-                interactive=True
+                interactive=True,
             )
     with gr.Group():
         with gr.Row():
