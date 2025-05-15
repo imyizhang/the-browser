@@ -8,10 +8,7 @@ from typing import Any, AsyncGenerator, Dict, Optional
 import gradio as gr
 
 # from browser_use.agent.service import Agent
-from browser_use.agent.views import (
-    AgentHistoryList,
-    AgentOutput,
-)
+from browser_use.agent.views import AgentHistoryList, AgentOutput
 from browser_use.browser.browser import BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from browser_use.browser.views import BrowserState
@@ -31,12 +28,12 @@ logger = logging.getLogger(__name__)
 
 
 async def _initialize_llm(
-        provider: Optional[str],
-        model_name: Optional[str],
-        temperature: float,
-        base_url: Optional[str],
-        api_key: Optional[str],
-        num_ctx: Optional[int] = None,
+    provider: Optional[str],
+    model_name: Optional[str],
+    temperature: float,
+    base_url: Optional[str],
+    api_key: Optional[str],
+    num_ctx: Optional[int] = None,
 ) -> Optional[BaseChatModel]:
     """Initializes the LLM based on settings. Returns None if provider/model is missing."""
     if not provider or not model_name:
@@ -67,10 +64,10 @@ async def _initialize_llm(
 
 
 def _get_config_value(
-        webui_manager: WebuiManager,
-        comp_dict: Dict[gr.components.Component, Any],
-        comp_id_suffix: str,
-        default: Any = None,
+    webui_manager: WebuiManager,
+    comp_dict: Dict[gr.components.Component, Any],
+    comp_id_suffix: str,
+    default: Any = None,
 ) -> Any:
     """Safely get value from component dictionary using its ID suffix relative to the tab."""
     # Assumes component ID format is "tab_name.comp_name"
@@ -132,7 +129,7 @@ def _format_agent_output(model_output: AgentOutput) -> str:
 
 
 async def _handle_new_step(
-        webui_manager: WebuiManager, state: BrowserState, output: AgentOutput, step_num: int
+    webui_manager: WebuiManager, state: BrowserState, output: AgentOutput, step_num: int
 ):
     """Callback for each step taken by the agent, including screenshot display."""
 
@@ -156,12 +153,12 @@ async def _handle_new_step(
         try:
             # Basic validation: check if it looks like base64
             if (
-                    isinstance(screenshot_data, str) and len(screenshot_data) > 100
+                isinstance(screenshot_data, str) and len(screenshot_data) > 100
             ):  # Arbitrary length check
                 # *** UPDATED STYLE: Removed centering, adjusted width ***
                 img_tag = f'<img src="data:image/jpeg;base64,{screenshot_data}" alt="Step {step_num} Screenshot" style="max-width: 800px; max-height: 600px; object-fit:contain;" />'
                 screenshot_html = (
-                        img_tag + "<br/>"
+                    img_tag + "<br/>"
                 )  # Use <br/> for line break after inline-block image
             else:
                 logger.warning(
@@ -222,7 +219,7 @@ def _handle_done(webui_manager: WebuiManager, history: AgentHistoryList):
 
 
 async def _ask_assistant_callback(
-        webui_manager: WebuiManager, query: str, browser_context: BrowserContext
+    webui_manager: WebuiManager, query: str, browser_context: BrowserContext
 ) -> Dict[str, Any]:
     """Callback triggered by the agent's ask_for_assistant action."""
     logger.info("Agent requires assistance. Waiting for user input.")
@@ -273,7 +270,7 @@ async def _ask_assistant_callback(
 
 
 async def run_agent_task(
-        webui_manager: WebuiManager, components: Dict[gr.components.Component, Any]
+    webui_manager: WebuiManager, components: Dict[gr.components.Component, Any]
 ) -> AsyncGenerator[Dict[gr.components.Component, Any], None]:
     """Handles the entire lifecycle of initializing and running the agent."""
 
@@ -302,7 +299,7 @@ async def run_agent_task(
     # --- 1. Get Task and Initial UI Update ---
     task = components.get(user_input_comp, "").strip()
     if not task:
-        gr.Warning("Please enter a task.")
+        gr.Warning("Please enter your task.")
         yield {run_button_comp: gr.update(interactive=True)}
         return
 
@@ -422,7 +419,7 @@ async def run_agent_task(
 
     # Pass the webui_manager instance to the callback when wrapping it
     async def ask_callback_wrapper(
-            query: str, browser_context: BrowserContext
+        query: str, browser_context: BrowserContext
     ) -> Dict[str, Any]:
         return await _ask_assistant_callback(webui_manager, query, browser_context)
 
@@ -452,10 +449,14 @@ async def run_agent_task(
             logger.info("Launching new browser instance.")
             extra_args = [f"--window-size={window_w},{window_h}"]
             if use_own_browser:
-                browser_binary_path = os.getenv("BROWSER_PATH", None) or browser_binary_path
+                browser_binary_path = (
+                    os.getenv("BROWSER_PATH", None) or browser_binary_path
+                )
                 if browser_binary_path == "":
                     browser_binary_path = None
-                browser_user_data = browser_user_data_dir or os.getenv("BROWSER_USER_DATA", None)
+                browser_user_data = browser_user_data_dir or os.getenv(
+                    "BROWSER_USER_DATA", None
+                )
                 if browser_user_data:
                     extra_args += [f"--user-data-dir={browser_user_data}"]
             else:
@@ -509,7 +510,7 @@ async def run_agent_task(
 
         # Pass the webui_manager to callbacks when wrapping them
         async def step_callback_wrapper(
-                state: BrowserState, output: AgentOutput, step_num: int
+            state: BrowserState, output: AgentOutput, step_num: int
         ):
             await _handle_new_step(webui_manager, state, output, step_num)
 
@@ -578,7 +579,7 @@ async def run_agent_task(
                     await asyncio.sleep(0.2)
 
                 if (
-                        agent_task.done() or is_stopped
+                    agent_task.done() or is_stopped
                 ):  # If stopped or task finished while paused
                     break
 
@@ -629,8 +630,8 @@ async def run_agent_task(
                 yield update_dict
                 # Wait until response is submitted or task finishes
                 while (
-                        webui_manager.bu_response_event is not None
-                        and not agent_task.done()
+                    webui_manager.bu_response_event is not None
+                    and not agent_task.done()
                 ):
                     await asyncio.sleep(0.2)
                 # Restore UI after response submitted or if task ended unexpectedly
@@ -712,9 +713,9 @@ async def run_agent_task(
         except asyncio.CancelledError:
             logger.info("Agent task was cancelled.")
             if not any(
-                    "Cancelled" in msg.get("content", "")
-                    for msg in webui_manager.bu_chat_history
-                    if msg.get("role") == "assistant"
+                "Cancelled" in msg.get("content", "")
+                for msg in webui_manager.bu_chat_history
+                if msg.get("role") == "assistant"
             ):
                 webui_manager.bu_chat_history.append(
                     {"role": "assistant", "content": "**Task Cancelled**."}
@@ -726,9 +727,9 @@ async def run_agent_task(
                 f"**Agent Execution Error:**\n```\n{type(e).__name__}: {e}\n```"
             )
             if not any(
-                    error_message in msg.get("content", "")
-                    for msg in webui_manager.bu_chat_history
-                    if msg.get("role") == "assistant"
+                error_message in msg.get("content", "")
+                for msg in webui_manager.bu_chat_history
+                if msg.get("role") == "assistant"
             ):
                 webui_manager.bu_chat_history.append(
                     {"role": "assistant", "content": error_message}
@@ -784,7 +785,7 @@ async def run_agent_task(
             clear_button_comp: gr.update(interactive=True),
             chatbot_comp: gr.update(
                 value=webui_manager.bu_chat_history
-                      + [{"role": "assistant", "content": f"**Setup Error:** {e}"}]
+                + [{"role": "assistant", "content": f"**Setup Error:** {e}"}]
             ),
         }
 
@@ -793,7 +794,7 @@ async def run_agent_task(
 
 
 async def handle_submit(
-        webui_manager: WebuiManager, components: Dict[gr.components.Component, Any]
+    webui_manager: WebuiManager, components: Dict[gr.components.Component, Any]
 ):
     """Handles clicks on the main 'Submit' button."""
     user_input_comp = webui_manager.get_component_by_id("browser_use_agent.user_input")
@@ -980,14 +981,14 @@ def create_browser_use_agent_tab(webui_manager: WebuiManager):
         chatbot = gr.Chatbot(
             lambda: webui_manager.bu_chat_history,  # Load history dynamically
             elem_id="browser_use_chatbot",
-            label="Agent Interaction",
+            label="Control Your Browser with AI Agent",
             type="messages",
             height=600,
             show_copy_button=True,
         )
         user_input = gr.Textbox(
-            label="Your Task or Response",
-            placeholder="Enter your task here or provide assistance when asked.",
+            label="Your Inputs",
+            placeholder="Enter your task here or provide assistance when asked by agent",
             lines=3,
             interactive=True,
             elem_id="user_input",
@@ -1002,7 +1003,7 @@ def create_browser_use_agent_tab(webui_manager: WebuiManager):
             clear_button = gr.Button(
                 "🗑️ Clear", interactive=True, variant="secondary", scale=2
             )
-            run_button = gr.Button("▶️ Submit Task", variant="primary", scale=3)
+            run_button = gr.Button("▶️ Submit", variant="primary", scale=2)
 
         browser_view = gr.HTML(
             value="<div style='width:100%; height:50vh; display:flex; justify-content:center; align-items:center; border:1px solid #ccc; background-color:#f0f0f0;'><p>Browser View (Requires Headless=True)</p></div>",
@@ -1044,7 +1045,7 @@ def create_browser_use_agent_tab(webui_manager: WebuiManager):
     run_tab_outputs = list(tab_components.values())
 
     async def submit_wrapper(
-            components_dict: Dict[Component, Any],
+        components_dict: Dict[Component, Any],
     ) -> AsyncGenerator[Dict[Component, Any], None]:
         """Wrapper for handle_submit that yields its results."""
         async for update in handle_submit(webui_manager, components_dict):

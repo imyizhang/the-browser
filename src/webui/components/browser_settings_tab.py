@@ -40,28 +40,30 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
                 label="Browser Binary Path",
                 value=os.getenv("BROWSER_PATH", None),
                 lines=1,
+                info="Path to your existing browser",
                 interactive=True,
                 placeholder="e.g. '/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome'",
             )
             browser_user_data_dir = gr.Textbox(
-                label="Browser User Data Dir",
+                label="Browser User Data Path",
                 value=os.getenv("BROWSER_USER_DATA", None),
                 lines=1,
+                info="Path to your existing browser user data",
                 interactive=True,
-                placeholder="Leave it empty if you use your default user data",
+                placeholder="Leave blank to use your default browser user data",
             )
     with gr.Group():
         with gr.Row():
             use_own_browser = gr.Checkbox(
                 label="Use Own Browser",
-                value=os.getenv("USE_OWN_BROWSER", True),
+                value=bool(os.getenv("USE_OWN_BROWSER", True)),
                 info="Use your existing browser instance",
                 interactive=True,
             )
             keep_browser_open = gr.Checkbox(
                 label="Keep Browser Open",
-                value=os.getenv("KEEP_BROWSER_OPEN", True),
-                info="Keep Browser Open between Tasks",
+                value=bool(os.getenv("KEEP_BROWSER_OPEN", True)),
+                info="Keep browser open across tasks",
                 interactive=True,
             )
             headless = gr.Checkbox(
@@ -81,13 +83,13 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
         with gr.Row():
             window_w = gr.Number(
                 label="Window Width",
-                value=1280,
+                value=int(os.getenv("RESOLUTION_WIDTH", 1280)),
                 info="Browser window width",
                 interactive=True,
             )
             window_h = gr.Number(
                 label="Window Height",
-                value=1100,
+                value=int(os.getenv("RESOLUTION_HEIGHT", 1100)),
                 info="Browser window height",
                 interactive=True,
             )
@@ -101,6 +103,7 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
             )
             wss_url = gr.Textbox(
                 label="WSS URL",
+                value=os.getenv("BROWSER_WSS", None),
                 info="WSS URL for browser remote debugging",
                 interactive=True,
             )
@@ -116,7 +119,7 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
             save_trace_path = gr.Textbox(
                 label="Trace Path",
                 placeholder="e.g. ./tmp/traces",
-                info="Path to save Agent traces",
+                info="Path to save agent traces",
                 interactive=True,
             )
 
@@ -124,13 +127,13 @@ def create_browser_settings_tab(webui_manager: WebuiManager):
             save_agent_history_path = gr.Textbox(
                 label="Agent History Save Path",
                 value="./tmp/agent_history",
-                info="Specify the directory where agent history should be saved.",
+                info="Path to save agent history",
                 interactive=True,
             )
             save_download_path = gr.Textbox(
-                label="Save Directory for browser downloads",
+                label="Browser Downloads Save Path",
                 value="./tmp/downloads",
-                info="Specify the directory where downloaded files should be saved.",
+                info="Path to save browser downloaded",
                 interactive=True,
             )
     tab_components.update(

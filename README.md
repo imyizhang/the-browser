@@ -16,7 +16,7 @@ Only macOS is supported.
 
 ### Browsers
 
-Chrome and non-Chrome browser should be installed first.
+Chrome and non-Chrome browsers should be installed first.
 
 
 
@@ -56,7 +56,7 @@ Install Browsers in Patchright:
 ```bash
 patchright install --with-deps
 ```
-rr you can install specific browsers:
+or you can install specific browsers:
 ```bash
 patchright install chromium --with-deps
 ```
@@ -77,7 +77,7 @@ cp .env.example .env
 Run The Browser:
 
 ```bash
-python app.py --ip 127.0.0.1 --port 7788
+python app.py --ip 127.0.0.1 --port 7788 --theme Ocean
 ```
 
 

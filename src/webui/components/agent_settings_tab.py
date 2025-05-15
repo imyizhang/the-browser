@@ -56,18 +56,18 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
     with gr.Group():
         with gr.Column():
             override_system_prompt = gr.Textbox(
-                label="Override system prompt", lines=4, interactive=True
+                label="Override System Prompt", lines=4, interactive=True
             )
             extend_system_prompt = gr.Textbox(
-                label="Extend system prompt", lines=4, interactive=True
+                label="Extend System Prompt", lines=4, interactive=True
             )
 
     with gr.Group():
         mcp_json_file = gr.File(
-            label="MCP server json", interactive=True, file_types=[".json"]
+            label="MCP Server JSON", interactive=True, file_types=[".json"]
         )
         mcp_server_config = gr.Textbox(
-            label="MCP server", lines=6, interactive=True, visible=False
+            label="MCP Server", lines=6, interactive=True, visible=False
         )
 
     with gr.Group():
@@ -101,7 +101,7 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
             use_vision = gr.Checkbox(
                 label="Use Vision",
                 value=False,
-                info="Enable Vision(Input highlighted screenshot into LLM)",
+                info="Enable Vision mode (input highlighted screenshot into LLM)",
                 interactive=True,
             )
 
@@ -118,13 +118,15 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
 
         with gr.Row():
             llm_base_url = gr.Textbox(
-                label="Base URL", value="", info="API endpoint URL (if required)"
+                label="Base URL",
+                value="",
+                info="API endpoint URL (leave blank to use environment variables)",
             )
             llm_api_key = gr.Textbox(
                 label="API Key",
                 type="password",
                 value="",
-                info="Your API key (leave blank to use .env)",
+                info="Your API key (leave blank to use environment variables)",
             )
 
     with gr.Group():
@@ -156,7 +158,7 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
             planner_use_vision = gr.Checkbox(
                 label="Use Vision(Planner LLM)",
                 value=False,
-                info="Enable Vision(Input highlighted screenshot into LLM)",
+                info="Enable Vision mode (input highlighted screenshot into LLM)",
                 interactive=True,
             )
 
@@ -173,13 +175,15 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
 
         with gr.Row():
             planner_llm_base_url = gr.Textbox(
-                label="Base URL", value="", info="API endpoint URL (if required)"
+                label="Base URL",
+                value="",
+                info="API endpoint URL (leave blank to use environment variables)",
             )
             planner_llm_api_key = gr.Textbox(
                 label="API Key",
                 type="password",
                 value="",
-                info="Your API key (leave blank to use .env)",
+                info="Your API key (leave blank to use environment variables)",
             )
 
     with gr.Row():
